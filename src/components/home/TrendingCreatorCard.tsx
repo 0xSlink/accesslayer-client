@@ -7,12 +7,14 @@ type Props = { creator: Course & { walletAddress: string } };
 import { formatHolderCount } from '@/utils/numberFormat.utils';
 import { cn } from '@/lib/utils';
 import { creatorCardSubtitleClampClass } from '@/utils/lineClamp.utils';
+import { useFormatXlm } from '@/hooks/useFormatXlm';
 
 export default function TrendingCreatorCard({ creator }: Props) {
 	const name = creator.title || 'Unnamed creator';
 	const avatar = makeBlockie(creator.walletAddress);
+	const { format: formatXlm } = useFormatXlm();
 	const priceXlm = creator.priceStroops
-		? (creator.priceStroops / 1e7).toFixed(2)
+		? formatXlm(creator.priceStroops)
 		: creator.price.toFixed(2);
 
 	return (
