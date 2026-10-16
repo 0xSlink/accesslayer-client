@@ -8,12 +8,17 @@ export default defineConfig({
 		globals: true,
 		environment: 'jsdom',
 		setupFiles: ['./src/test/setup.ts'],
-		exclude: [...configDefaults.exclude, '**/.kilo/**'],
 		pool: 'forks',
 		maxWorkers: 1,
 		minWorkers: 1,
 		fileParallelism: false,
-		exclude: ['**/.kilo/**', '**/.kiro/**', '**/node_modules/**', '**/dist/**'],
+		exclude: [
+			...configDefaults.exclude,
+			'**/.kilo/**',
+			'**/.kiro/**',
+			'**/node_modules/**',
+			'**/dist/**',
+		],
 	},
 	resolve: {
 		alias: {
