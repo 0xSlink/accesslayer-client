@@ -75,6 +75,8 @@ export interface BuySellKeyFlowProps {
 	onSuccess?: (params: BuySellTradeParams) => void;
 	onError?: (error: unknown) => void;
 	isSubmitting?: boolean;
+	/** True when an admin has paused trading for this specific key (#777). */
+	tradingPaused?: boolean;
 	className?: string;
 }
 
@@ -110,6 +112,7 @@ export const BuySellKeyFlow: React.FC<BuySellKeyFlowProps> = ({
 	onSuccess,
 	onError,
 	isSubmitting: externalIsSubmitting = false,
+	tradingPaused = false,
 	className,
 }) => {
 	const effectiveHoldingCap = useMemo(
@@ -131,7 +134,9 @@ export const BuySellKeyFlow: React.FC<BuySellKeyFlowProps> = ({
 	>(null);
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
 	const [internalSubmitting, setInternalSubmitting] = useState(false);
-	const { paused } = useGlobalPause();
+	const { paused: globalPaused } = useGlobalPause();
+	// Trading is blocked by a platform-wide pause OR a pause on this key (#777).
+	const paused = globalPaused || tradingPaused;
 
 	const isSubmitting = externalIsSubmitting || internalSubmitting;
 
