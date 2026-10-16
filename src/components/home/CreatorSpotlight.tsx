@@ -1,6 +1,5 @@
 import { Users, Star, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { Users, Star, ArrowRight } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import { courseService, type Course } from '@/services/course.service';
