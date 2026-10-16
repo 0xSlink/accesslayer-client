@@ -8,6 +8,7 @@ import MarketOverview from '../components/home/MarketOverview';
 import TrendingCreators from '../components/home/TrendingCreators';
 import TrendingLeaderboard from '../components/home/TrendingLeaderboard';
 import RecentlyViewedSection from '../components/home/RecentlyViewedSection';
+import DiscoveryFeed from '../components/home/DiscoveryFeed';
 import { useNavigationTiming } from '../hooks/useNavigationTiming';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useLocation } from 'react-router';
@@ -34,6 +35,9 @@ export default function HomePage() {
 				</SectionErrorBoundary>
 				<SectionErrorBoundary sectionName="market overview">
 					<MarketOverview />
+				</SectionErrorBoundary>
+				<SectionErrorBoundary sectionName="discovery feed">
+					<DiscoveryFeed />
 				</SectionErrorBoundary>
 				<SectionErrorBoundary sectionName="creator spotlight">
 					<CreatorSpotlight />

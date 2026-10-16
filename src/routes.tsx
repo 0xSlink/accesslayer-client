@@ -28,6 +28,7 @@ import HolderLeaderboardPage from './pages/HolderLeaderboardPage';
 import BundlesPage from './pages/BundlesPage';
 import BundleDetailPage from './pages/BundleDetailPage';
 import SearchResultsPage from './pages/SearchResultsPage';
+import AutoInvestDashboardPage from './pages/AutoInvestDashboardPage';
 import RouteErrorBoundary from './components/common/RouteErrorBoundary';
 
 function withRouteErrorBoundary(element: ReactNode, routeName: string) {
@@ -177,6 +178,10 @@ export const routes = [
 			{
 				path: '/staking',
 				element: <StakingDashboardPage />,
+			},
+			{
+				path: '/auto-invest',
+				element: <AutoInvestDashboardPage />,
 			},
 			{
 				path: '/swap/create',
