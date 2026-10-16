@@ -9,6 +9,7 @@ import CreatorDashboardPage from './pages/CreatorDashboardPage';
 import CreatorPublicProfilePage from './pages/CreatorPublicProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
 import NotificationPreferencesPage from './pages/NotificationPreferencesPage';
+import TransactionHistoryPage from './pages/TransactionHistoryPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import DiscoveryPage from './pages/DiscoveryPage';
 import ProfilePage from './pages/ProfilePage';
@@ -211,6 +212,10 @@ export const routes = [
 			{
 				path: '/settings/notifications',
 				element: <NotificationPreferencesPage />,
+			},
+			{
+				path: '/transactions',
+				element: <TransactionHistoryPage />,
 			},
 			{
 				path: '*',
