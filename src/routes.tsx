@@ -8,6 +8,7 @@ import CreatorDetailPage from './pages/CreatorDetailPage';
 import CreatorDashboardPage from './pages/CreatorDashboardPage';
 import CreatorPublicProfilePage from './pages/CreatorPublicProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
+import NotificationPreferencesPage from './pages/NotificationPreferencesPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import DiscoveryPage from './pages/DiscoveryPage';
 import ProfilePage from './pages/ProfilePage';
@@ -206,6 +207,10 @@ export const routes = [
 				// Global search results page (#1053).
 				path: '/search',
 				element: <SearchResultsPage />,
+			},
+			{
+				path: '/settings/notifications',
+				element: <NotificationPreferencesPage />,
 			},
 			{
 				path: '*',
