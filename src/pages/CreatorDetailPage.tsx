@@ -287,7 +287,10 @@ function CreatorDetailPageContent() {
 
 	const tradeMutation = useTradeMutation(connectedWalletAddress ?? '');
 
-	const { data: tradeCooldownStatus } = useTradeCooldownStatus(id || '');
+	const { data: tradeCooldownStatus } = useTradeCooldownStatus(
+		id || '',
+		userAddress
+	);
 
 	const tradeCooldown: ActiveTradeCooldown | null = resolveActiveTradeCooldown(
 		tradeCooldownStatus,
