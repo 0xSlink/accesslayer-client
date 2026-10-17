@@ -79,10 +79,10 @@ export const queryKeys = {
 		activity: (address: string) => ['wallet', address, 'activity'] as const,
 		tradeHistory: (address: string) =>
 			['wallet', address, 'tradeHistory'] as const,
-	vestingPositions: (address: string) =>
-		['wallet', address, 'vestingPositions'] as const,
-	stakingPositions: (address: string) =>
-		['wallet', address, 'stakingPositions'] as const,
+		vestingPositions: (address: string) =>
+			['wallet', address, 'vestingPositions'] as const,
+		stakingPositions: (address: string) =>
+			['wallet', address, 'stakingPositions'] as const,
 		xlmBalance: (address: string) =>
 			['wallet', address, 'xlmBalance'] as const,
 	},
@@ -107,7 +107,8 @@ export const queryKeys = {
 	},
 	admin: {
 		treasury: () => ['admin', 'treasury', 'balance'] as const,
-		treasuryDistributions: () => ['admin', 'treasury', 'distributions'] as const,
+		treasuryDistributions: () =>
+			['admin', 'treasury', 'distributions'] as const,
 		treasuryFees: () => ['admin', 'treasury', 'fees'] as const,
 		oracleCallers: () => ['admin', 'oracle', 'callers'] as const,
 		multiSigPending: () => ['admin', 'multisig', 'pending'] as const,
@@ -151,8 +152,7 @@ export const queryKeys = {
 	},
 	staking: {
 		all: () => ['staking'] as const,
-		dashboard: (wallet: string) =>
-			['staking', wallet, 'dashboard'] as const,
+		dashboard: (wallet: string) => ['staking', wallet, 'dashboard'] as const,
 	},
 	atomicSwap: {
 		all: () => ['atomic-swap'] as const,
@@ -190,5 +190,12 @@ export const queryKeys = {
 		/** Active vault stakes for a (wallet, key) pair. */
 		stakes: (wallet: string, keyId: string) =>
 			['staking-vault', 'stakes', wallet, keyId] as const,
+	},
+	autoInvest: {
+		all: () => ['auto-invest'] as const,
+		rules: () => ['auto-invest', 'rules'] as const,
+		history: (limit?: number) =>
+			['auto-invest', 'history', limit ?? 50] as const,
+		settings: () => ['auto-invest', 'settings'] as const,
 	},
 } as const;
