@@ -17,6 +17,8 @@ import KeySimulationTool from '@/components/common/KeySimulationTool';
 import BuyCooldownCountdown from '@/components/common/BuyCooldownCountdown';
 import KeyHolderList from '@/components/common/KeyHolderList';
 import HolderConcentrationChart from '@/components/common/HolderConcentrationChart';
+import HolderSnapshotHistory from '@/components/common/HolderSnapshotHistory';
+import GraduationCelebration from '@/components/common/GraduationCelebration';
 import StakingRewardsSection from '@/components/common/StakingRewardsSection';
 import StakingVaultPanel from '@/components/common/StakingVaultPanel';
 import DeprecationNotice from '@/components/common/DeprecationNotice';
@@ -800,6 +802,16 @@ function CreatorDetailPageContent() {
 					isLoading={isLoading}
 				/>
 
+				<SectionErrorBoundary sectionName="graduation">
+					<GraduationCelebration
+						keyId={creator.id}
+						keyName={creator.title || creator.name || 'This key'}
+						currentSupply={creator.creatorShareSupply}
+						holderCount={holders.length > 0 ? holders.length : null}
+						walletAddress={connectedWalletAddress}
+					/>
+				</SectionErrorBoundary>
+
 				{auctionPhase !== 'active' && (
 					<>
 						<div
@@ -850,6 +862,19 @@ function CreatorDetailPageContent() {
 							holders={holders}
 							totalSupply={creator.creatorShareSupply}
 						/>
+					</SectionErrorBoundary>
+				</div>
+
+				<div
+					className="rounded-[2rem] border border-white/10 bg-white/[0.02] p-6 shadow-2xl backdrop-blur-md md:p-8"
+					data-testid="holder-snapshot-history-container"
+				>
+					<h2 className="mb-6 font-grotesque text-xl font-black tracking-tight text-white">
+						Holder Snapshot History
+					</h2>
+
+					<SectionErrorBoundary sectionName="holder snapshot history">
+						<HolderSnapshotHistory keyId={creator.id} />
 					</SectionErrorBoundary>
 				</div>
 

@@ -29,6 +29,8 @@ export const queryKeys = {
 			['creators', creatorId, 'priceHistory', interval] as const,
 		holders: (creatorId: string) =>
 			['creators', creatorId, 'holders'] as const,
+		holderSnapshots: (creatorId: string, range: string) =>
+			['creators', creatorId, 'holder-snapshots', range] as const,
 		activity: (creatorId: string) =>
 			['creators', creatorId, 'activity'] as const,
 		twap: (creatorId: string, window = '24h') =>
@@ -79,6 +81,8 @@ export const queryKeys = {
 		activity: (address: string) => ['wallet', address, 'activity'] as const,
 		tradeHistory: (address: string) =>
 			['wallet', address, 'tradeHistory'] as const,
+		allTradeHistory: (address: string) =>
+			['wallet', address, 'allTradeHistory'] as const,
 		vestingPositions: (address: string) =>
 			['wallet', address, 'vestingPositions'] as const,
 		stakingPositions: (address: string) =>

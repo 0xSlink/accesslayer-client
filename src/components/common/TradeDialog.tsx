@@ -70,6 +70,11 @@ import {
 	computeSlippageBounds,
 	type SlippageBounds,
 } from '@/utils/slippageTolerance.utils';
+import LiquidityDepthIndicator from '@/components/common/LiquidityDepthIndicator';
+import {
+	classifyLiquidityDepth,
+	computeMaxBuyWithinSlippage,
+} from '@/utils/liquidityDepth.utils';
 import { useGlobalPause } from '@/hooks/useGlobalPause';
 import { UnavailableAction } from '@/components/ui/unavailable-action';
 import { useContractPausedStore, selectIsPaused } from '@/hooks/useContractPausedStore';
@@ -428,6 +433,23 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 		side === 'buy' && circuitBreakerStatus?.isBreached
 	);
 
+	// Liquidity depth (#1108): max keys buyable within the slippage tolerance.
+	const liquidityMaxDepth = useMemo(
+		() =>
+			side === 'buy' && currentSupply != null
+				? computeMaxBuyWithinSlippage({
+						currentSupply,
+						slippageTolerancePercent,
+					})
+				: null,
+		[side, currentSupply, slippageTolerancePercent]
+	);
+	const liquidityDepthStatus =
+		liquidityMaxDepth != null
+			? classifyLiquidityDepth(parsedAmount, liquidityMaxDepth)
+			: 'ok';
+	const exceedsLiquidityDepth = liquidityDepthStatus === 'exceeded';
+
 	const isAllowanceChecking =
 		side === 'stake' && allowanceStatus === 'checking';
 	const requiresAllowanceApproval = side === 'stake' && needsApproval;
@@ -437,6 +459,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 		isApproving ||
 		isAllowanceChecking ||
 		isCircuitBreakerBreached ||
+		exceedsLiquidityDepth ||
 		atCap ||
 		isPaused ||
 		requiresAllowanceApproval;
@@ -950,6 +973,14 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 					</p>
 				)}
 
+				{side === 'buy' && liquidityMaxDepth != null && (
+					<LiquidityDepthIndicator
+						maxDepth={liquidityMaxDepth}
+						slippageTolerancePercent={slippageTolerancePercent}
+						status={liquidityDepthStatus}
+					/>
+				)}
+
 				<div className="flex flex-wrap items-center gap-2 text-xs text-white/45">
 					<span
 						aria-label={`Current wallet holdings: ${formatNumber(availableHoldings)} keys`}
@@ -1088,6 +1119,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 					disabled={
 						!amountValid ||
 						isSubmitting ||
+						exceedsLiquidityDepth ||
 						(side === 'buy' && (previewLoading || previewError != null)) ||
 						paused
 					}
