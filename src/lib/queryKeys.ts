@@ -95,6 +95,10 @@ export const queryKeys = {
 		all: () => ['notifications'] as const,
 		list: (userId: string) => ['notifications', userId, 'list'] as const,
 	},
+	sessions: {
+		all: () => ['sessions'] as const,
+		list: (userId: string) => ['sessions', userId, 'list'] as const,
+	},
 	alerts: {
 		all: () => ['alerts'] as const,
 		active: (userId: string) => ['alerts', userId, 'active'] as const,
