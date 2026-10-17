@@ -15,7 +15,7 @@ import PortfolioSummaryHeader from '@/components/common/PortfolioSummaryHeader';
 import HeldKeysGrid from '@/components/common/HeldKeysGrid';
 import StakingPositionsList from '@/components/common/StakingPositionsList';
 import LiquidityPositionsSection from '@/components/common/LiquidityPositionsSection';
-import TradeHistoryTable from '@/components/common/TradeHistoryTable';
+import TradeHistoryLedger from '@/components/common/TradeHistoryLedger';
 import AtomicSwapHistory from '@/components/common/AtomicSwapHistory';
 import ProtocolRevenueClaim from '@/components/common/ProtocolRevenueClaim';
 import ProtocolRevenueDistributionTable from '@/components/common/ProtocolRevenueDistributionTable';
@@ -521,10 +521,7 @@ export default function ProfilePage() {
 								</p>
 							</div>{' '}
 							<SectionErrorBoundary sectionName="trade history">
-								<TradeHistoryTable
-									walletAddress={profileWallet}
-									infiniteScroll
-								/>
+								<TradeHistoryLedger walletAddress={profileWallet} />
 							</SectionErrorBoundary>
 						</div>
 					</section>
