@@ -56,15 +56,17 @@ import showToast from '@/utils/toast.util';
 import { getSignatureErrorMessage } from '@/utils/errorHandling.utils';
 import { usePurchaseConfetti } from '@/hooks/usePurchaseConfetti';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { useKeyTwap } from '@/hooks/useKeyTwap';
+import { useKeyTwap, type TwapWindow } from '@/hooks/useKeyTwap';
 import { useKeyStats } from '@/hooks/useKeyStats';
 import { useKeyUniqueTraders } from '@/hooks/useKeyUniqueTraders';
 import { useKeyConfig } from '@/hooks/useKeyConfig';
 import KeyStatsPanel from '@/components/common/KeyStatsPanel';
 import Skeleton from '@/components/ui/skeleton';
 import { Tooltip } from '@/components/ui/tooltip';
+import { UnavailableAction } from '@/components/ui/unavailable-action';
 import GraduatedCurveMilestoneChart from '@/components/common/GraduatedCurveMilestoneChart';
 import KeyDeprecationBanner from '@/components/common/KeyDeprecationBanner';
+import KeyTradingPausedBanner from '@/components/common/KeyTradingPausedBanner';
 import MergeProposalBanner from '@/components/common/MergeProposalBanner';
 import KeyBuybackModal from '@/components/common/KeyBuybackModal';
 import type { KeyBuybackReceipt } from '@/hooks/useKeyBuyback';
@@ -156,7 +158,8 @@ function CreatorDetailPageContent() {
 	const nextBuyAllowedAt =
 		userPosition?.nextBuyAllowedAt ?? creator?.nextBuyAllowedAt ?? null;
 
-	const { data: twap, isLoading: isTwapLoading } = useKeyTwap(id || '');
+	const [twapWindow, setTwapWindow] = useState<TwapWindow>('24h');
+	const { data: twap, isLoading: isTwapLoading } = useKeyTwap(id || '', twapWindow);
 
 	const {
 		data: keyStats,
@@ -287,7 +290,10 @@ function CreatorDetailPageContent() {
 
 	const tradeMutation = useTradeMutation(connectedWalletAddress ?? '');
 
-	const { data: tradeCooldownStatus } = useTradeCooldownStatus(id || '');
+	const { data: tradeCooldownStatus } = useTradeCooldownStatus(
+		id || '',
+		userAddress
+	);
 
 	const tradeCooldown: ActiveTradeCooldown | null = resolveActiveTradeCooldown(
 		tradeCooldownStatus,
@@ -485,6 +491,8 @@ function CreatorDetailPageContent() {
 					/>
 				)}
 
+				<KeyTradingPausedBanner tradingPaused={creator.tradingPaused} />
+
 				<MergeProposalBanner
 					sourceKeyId={id || ''}
 					holdingsCount={holdingsCount}
@@ -646,6 +654,16 @@ function CreatorDetailPageContent() {
 							>
 								Buy Disabled (Deprecated)
 							</Button>
+						) : creator.tradingPaused ? (
+							<UnavailableAction disabled reason="Trading is currently paused">
+								<Button
+									type="button"
+									data-testid="key-detail-buy-button"
+									className="min-h-11 w-full rounded-xl bg-amber-400 font-bold text-slate-950 hover:bg-amber-300 sm:h-10 sm:min-h-0 sm:w-auto"
+								>
+									Buy Key
+								</Button>
+							</UnavailableAction>
 						) : buyDisabledReason ? (
 							<Tooltip content={buyDisabledReason}>
 								<span
@@ -714,7 +732,7 @@ function CreatorDetailPageContent() {
 						className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4"
 						data-testid="twap-price"
 					>
-						<div aria-label="Loading 24 hour TWAP" role="status">
+						<div aria-label={`Loading ${twapWindow === '1h' ? '1 hour' : '24 hour'} TWAP`} role="status">
 							<Skeleton className="h-3 w-24" />
 							<Skeleton className="mt-2 h-6 w-32" />
 						</div>
@@ -736,13 +754,13 @@ function CreatorDetailPageContent() {
 												: ''
 										}
 									>
-										TWAP (24h)
+										TWAP ({twapWindow})
 									</span>
 
-									<Tooltip content="Time-weighted average price over the past 24 hours. Less sensitive to short-term manipulation.">
+									<Tooltip content={`Time-weighted average price over the past ${twapWindow === '1h' ? '1 hour' : '24 hours'}. Less sensitive to short-term manipulation.`}>
 										<button
 											type="button"
-											aria-label="What is 24 hour TWAP?"
+											aria-label={`What is ${twapWindow === '1h' ? '1 hour' : '24 hour'} TWAP?`}
 											className="-m-1 p-1 text-white/50"
 										>
 											ⓘ
@@ -795,6 +813,12 @@ function CreatorDetailPageContent() {
 							<BondingCurveChart
 								data={chartData}
 								currentSupply={creator.creatorShareSupply ?? 100}
+								currentPriceStroops={spotPrice ?? undefined}
+								spotPriceStroops={spotPrice}
+								twapPriceStroops={twapPrice}
+								twapWindow={twapWindow}
+								onTwapWindowChange={setTwapWindow}
+								isTwapLoading={isTwapLoading}
 								height={300}
 							/>
 						</div>
@@ -938,6 +962,7 @@ function CreatorDetailPageContent() {
 						onConfirm={handleConfirmBuy}
 						isSubmitting={tradeSubmitting}
 						requireConfirmation={true}
+						tradingPaused={creator.tradingPaused}
 					/>
 				)}
 

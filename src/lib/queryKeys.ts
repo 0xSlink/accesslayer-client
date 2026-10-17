@@ -31,8 +31,8 @@ export const queryKeys = {
 			['creators', creatorId, 'holders'] as const,
 		activity: (creatorId: string) =>
 			['creators', creatorId, 'activity'] as const,
-		twap: (creatorId: string) =>
-			['creators', creatorId, 'twap', '24h'] as const,
+		twap: (creatorId: string, window = '24h') =>
+			['creators', creatorId, 'twap', window] as const,
 		stats: (creatorId: string) => ['creators', creatorId, 'stats'] as const,
 		auctionBids: (creatorId: string) =>
 			['creators', creatorId, 'auction-bids'] as const,
@@ -54,8 +54,12 @@ export const queryKeys = {
 			['creators', creatorId, 'oracle-price'] as const,
 		performanceBond: (creatorId: string) =>
 			['creators', creatorId, 'performance-bond'] as const,
-		tradeCooldown: (creatorId: string) =>
-			['creators', creatorId, 'trade-cooldown'] as const,
+		// Optional wallet scopes the cache per connected wallet (#915); omit it
+		// to address every wallet's entry for the key (e.g. invalidation).
+		tradeCooldown: (creatorId: string, wallet?: string) =>
+			wallet
+				? (['creators', creatorId, 'trade-cooldown', wallet] as const)
+				: (['creators', creatorId, 'trade-cooldown'] as const),
 		whitelist: (creatorId: string) =>
 			['creators', creatorId, 'whitelist'] as const,
 		publicProfile: (address: string) =>
@@ -190,5 +194,12 @@ export const queryKeys = {
 		/** Active vault stakes for a (wallet, key) pair. */
 		stakes: (wallet: string, keyId: string) =>
 			['staking-vault', 'stakes', wallet, keyId] as const,
+	},
+	autoInvest: {
+		all: () => ['auto-invest'] as const,
+		rules: () => ['auto-invest', 'rules'] as const,
+		history: (limit?: number) =>
+			['auto-invest', 'history', limit ?? 50] as const,
+		settings: () => ['auto-invest', 'settings'] as const,
 	},
 } as const;

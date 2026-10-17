@@ -129,6 +129,8 @@ export interface TradeDialogProps {
 	circuitBreakerThresholdBps?: number | null;
 	/** Whether to display the confirmation modal step before submission (#919). Defaults to false. */
 	requireConfirmation?: boolean;
+	/** True when an admin has paused trading for this specific key (#777). */
+	tradingPaused?: boolean;
 	/** Optional XLM/USD spot rate for the confirmation fee USD equivalent (#994). */
 	xlmUsdRate?: number | null;
 	onOpenChange: (open: boolean) => void;
@@ -166,6 +168,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 	circuitBreakerThresholdPercent,
 	circuitBreakerThresholdBps,
 	requireConfirmation = false,
+	tradingPaused = false,
 	xlmUsdRate = null,
 	onOpenChange,
 	onConfirm,
@@ -228,7 +231,9 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 	const previewAbortControllerRef = useRef<AbortController | null>(null);
 	// Capture whatever had focus right before dialog opened; restore on close.
 	const triggerElementRef = useRef<HTMLElement | null>(null);
-	const { paused } = useGlobalPause();
+	const { paused: globalPaused } = useGlobalPause();
+	// Trading is blocked by a platform-wide pause OR a pause on this key (#777).
+	const paused = globalPaused || tradingPaused;
 
 	// On open: reset state, kick off allowance check + cap fetch.
 	useEffect(() => {

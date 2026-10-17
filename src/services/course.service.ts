@@ -120,6 +120,11 @@ export interface Course {
 	deprecated?: boolean;
 	/** Optional human-readable reason surfaced in the deprecation notice. */
 	deprecationReason?: string | null;
+	/**
+	 * Whether an admin has paused trading for this specific key (#777).
+	 * While true, buying and selling must be disabled in the UI.
+	 */
+	tradingPaused?: boolean;
 	/** Performance bond status for creator key protection (#975). */
 	performanceBond?: PerformanceBond | null;
 	/** Key-level circuit breaker price impact threshold in basis points. */
