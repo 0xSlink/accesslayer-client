@@ -105,6 +105,10 @@ export const queryKeys = {
 			['leaderboard', 'volume', window] as const,
 		ratings: () => ['leaderboard', 'ratings'] as const,
 	},
+	activity: {
+		all: () => ['activity'] as const,
+		recent: (limit = 5) => ['activity', 'recent', limit] as const,
+	},
 	admin: {
 		treasury: () => ['admin', 'treasury', 'balance'] as const,
 		treasuryDistributions: () =>
