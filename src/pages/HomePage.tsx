@@ -7,7 +7,6 @@ import CreatorSpotlight from '../components/home/CreatorSpotlight';
 import MarketOverview from '../components/home/MarketOverview';
 import TrendingCreators from '../components/home/TrendingCreators';
 import TrendingLeaderboard from '../components/home/TrendingLeaderboard';
-import ActivityFeed from '../components/home/ActivityFeed';
 import RecentlyViewedSection from '../components/home/RecentlyViewedSection';
 import DiscoveryFeed from '../components/home/DiscoveryFeed';
 import { useNavigationTiming } from '../hooks/useNavigationTiming';
