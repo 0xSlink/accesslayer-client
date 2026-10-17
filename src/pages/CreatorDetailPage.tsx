@@ -63,8 +63,10 @@ import { useKeyConfig } from '@/hooks/useKeyConfig';
 import KeyStatsPanel from '@/components/common/KeyStatsPanel';
 import Skeleton from '@/components/ui/skeleton';
 import { Tooltip } from '@/components/ui/tooltip';
+import { UnavailableAction } from '@/components/ui/unavailable-action';
 import GraduatedCurveMilestoneChart from '@/components/common/GraduatedCurveMilestoneChart';
 import KeyDeprecationBanner from '@/components/common/KeyDeprecationBanner';
+import KeyTradingPausedBanner from '@/components/common/KeyTradingPausedBanner';
 import MergeProposalBanner from '@/components/common/MergeProposalBanner';
 import KeyBuybackModal from '@/components/common/KeyBuybackModal';
 import type { KeyBuybackReceipt } from '@/hooks/useKeyBuyback';
@@ -489,6 +491,8 @@ function CreatorDetailPageContent() {
 					/>
 				)}
 
+				<KeyTradingPausedBanner tradingPaused={creator.tradingPaused} />
+
 				<MergeProposalBanner
 					sourceKeyId={id || ''}
 					holdingsCount={holdingsCount}
@@ -650,6 +654,16 @@ function CreatorDetailPageContent() {
 							>
 								Buy Disabled (Deprecated)
 							</Button>
+						) : creator.tradingPaused ? (
+							<UnavailableAction disabled reason="Trading is currently paused">
+								<Button
+									type="button"
+									data-testid="key-detail-buy-button"
+									className="min-h-11 w-full rounded-xl bg-amber-400 font-bold text-slate-950 hover:bg-amber-300 sm:h-10 sm:min-h-0 sm:w-auto"
+								>
+									Buy Key
+								</Button>
+							</UnavailableAction>
 						) : buyDisabledReason ? (
 							<Tooltip content={buyDisabledReason}>
 								<span
@@ -948,6 +962,7 @@ function CreatorDetailPageContent() {
 						onConfirm={handleConfirmBuy}
 						isSubmitting={tradeSubmitting}
 						requireConfirmation={true}
+						tradingPaused={creator.tradingPaused}
 					/>
 				)}
 
