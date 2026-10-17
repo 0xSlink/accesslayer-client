@@ -7,6 +7,7 @@ import CreatorSpotlight from '../components/home/CreatorSpotlight';
 import MarketOverview from '../components/home/MarketOverview';
 import TrendingCreators from '../components/home/TrendingCreators';
 import TrendingLeaderboard from '../components/home/TrendingLeaderboard';
+import ActivityFeed from '../components/home/ActivityFeed';
 import RecentlyViewedSection from '../components/home/RecentlyViewedSection';
 import { useNavigationTiming } from '../hooks/useNavigationTiming';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -34,6 +35,9 @@ export default function HomePage() {
 				</SectionErrorBoundary>
 				<SectionErrorBoundary sectionName="market overview">
 					<MarketOverview />
+				</SectionErrorBoundary>
+				<SectionErrorBoundary sectionName="activity feed">
+					<ActivityFeed />
 				</SectionErrorBoundary>
 				<SectionErrorBoundary sectionName="creator spotlight">
 					<CreatorSpotlight />
