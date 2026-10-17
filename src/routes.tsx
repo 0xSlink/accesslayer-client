@@ -2,6 +2,7 @@ import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
 import CreatorDetailPage from './pages/CreatorDetailPage';
 import NotificationsPage from './pages/NotificationsPage';
+import AccountSettingsPage from './pages/AccountSettingsPage';
 
 export const routes = [
 	{
@@ -23,6 +24,14 @@ export const routes = [
 	{
 		path: '/notifications',
 		element: <NotificationsPage />,
+	},
+	{
+		path: '/settings',
+		element: <AccountSettingsPage />,
+	},
+	{
+		path: '/account/settings',
+		element: <AccountSettingsPage />,
 	},
 	{
 		path: '*',

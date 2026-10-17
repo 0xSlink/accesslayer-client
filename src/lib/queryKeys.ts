@@ -34,4 +34,8 @@ export const queryKeys = {
 		all: () => ['notifications'] as const,
 		list: (userId: string) => ['notifications', userId, 'list'] as const,
 	},
+	sessions: {
+		all: () => ['sessions'] as const,
+		list: (userId: string) => ['sessions', userId, 'list'] as const,
+	},
 } as const;
