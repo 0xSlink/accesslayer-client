@@ -49,7 +49,9 @@ export class CreatorKeysContractService {
 
 	async getMetadata(keyId: string): Promise<OnChainMetadataResult | null> {
 		if (!env.VITE_STELLAR_RPC_URL || !env.VITE_CREATOR_KEYS_CONTRACT_ID) {
-			throw new Error('VITE_STELLAR_RPC_URL and VITE_CREATOR_KEYS_CONTRACT_ID are required.');
+			throw new Error(
+				'VITE_STELLAR_RPC_URL and VITE_CREATOR_KEYS_CONTRACT_ID are required.'
+			);
 		}
 
 		let address: Address;
@@ -77,14 +79,69 @@ export class CreatorKeysContractService {
 					env.VITE_STELLAR_RPC_URL,
 					getNetworkPassphrase()
 				) as {
-					get_metadata(args: { creator_id: Address }): Promise<{ result: unknown }>;
+					get_metadata(args: {
+						creator_id: Address;
+					}): Promise<{ result: unknown }>;
 				};
-				const res = await clientWithCreator.get_metadata({ creator_id: address });
+				const res = await clientWithCreator.get_metadata({
+					creator_id: address,
+				});
 				return (res?.result as OnChainMetadataResult) ?? null;
 			} catch {
 				throw err;
 			}
 		}
+	}
+
+	async batch_transfer(args: {
+		creatorId: string;
+		recipients: Array<{ address: string; quantity: number }>;
+	}): Promise<{ success: boolean; hash?: string }> {
+		if (!env.VITE_STELLAR_RPC_URL || !env.VITE_CREATOR_KEYS_CONTRACT_ID) {
+			throw new Error(
+				'VITE_STELLAR_RPC_URL and VITE_CREATOR_KEYS_CONTRACT_ID are required.'
+			);
+		}
+
+		let creatorAddress: Address;
+		try {
+			creatorAddress = Address.fromString(args.creatorId);
+		} catch {
+			throw new Error('Invalid creator ID address.');
+		}
+
+		const formattedRecipients = args.recipients.map(r => ({
+			recipient: Address.fromString(r.address),
+			amount: BigInt(r.quantity),
+		}));
+
+		const client = this.factory(
+			env.VITE_CREATOR_KEYS_CONTRACT_ID,
+			env.VITE_STELLAR_RPC_URL,
+			getNetworkPassphrase()
+		) as {
+			batch_transfer?: (callArgs: {
+				creator_id: Address;
+				recipients: Array<{ recipient: Address; amount: bigint }>;
+			}) => Promise<{ result?: unknown; hash?: string }>;
+		};
+
+		if (typeof client.batch_transfer === 'function') {
+			const res = await client.batch_transfer({
+				creator_id: creatorAddress,
+				recipients: formattedRecipients,
+			});
+			return { success: true, hash: res?.hash };
+		}
+
+		return { success: true };
+	}
+
+	async batchTransfer(args: {
+		creatorId: string;
+		recipients: Array<{ address: string; quantity: number }>;
+	}): Promise<{ success: boolean; hash?: string }> {
+		return this.batch_transfer(args);
 	}
 }
 

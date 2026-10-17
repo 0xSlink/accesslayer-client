@@ -62,8 +62,10 @@ import {
 	useWalletHoldings,
 	useReinvestDividendMutation,
 	useRedeemDeprecatedKeyMutation,
+	useBatchTransferMutation,
 	type SelfFreezeAction,
 } from '@/hooks/useWallet';
+
 import toast from 'react-hot-toast';
 import showToast from '@/utils/toast.util';
 import { getSignatureErrorMessage } from '@/utils/errorHandling.utils';
@@ -93,9 +95,7 @@ import {
 	CREATOR_CARD_ENTRY_CLASS,
 	creatorCardEntryStyle,
 } from '@/utils/cardEntryAnimation.utils';
-import {
-	resolveCreatorKeyPriceStroops,
-} from '@/utils/keyPriceDisplay.utils';
+import { resolveCreatorKeyPriceStroops } from '@/utils/keyPriceDisplay.utils';
 import { estimateReinvest } from '@/utils/reinvestDividend.utils';
 import { useTradeKeyboardShortcuts } from '@/hooks/useTradeKeyboardShortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
@@ -113,10 +113,7 @@ import MarketplaceSidebar from '@/components/common/MarketplaceSidebar';
 import BatchBuyBasket from '@/components/common/BatchBuyBasket';
 import BatchBuyConfirmDialog from '@/components/common/BatchBuyConfirmDialog';
 import BatchBuyBasketTrigger from '@/components/common/BatchBuyBasketTrigger';
-import {
-	useBatchBuyStore,
-	selectItemCount,
-} from '@/hooks/useBatchBuyStore';
+import { useBatchBuyStore, selectItemCount } from '@/hooks/useBatchBuyStore';
 import { copyTextToClipboard } from '@/utils/clipboard.utils';
 import SelfFreezeDialog from '@/components/common/SelfFreezeDialog';
 import SharePortfolioModal from '@/components/common/SharePortfolioModal';
@@ -321,9 +318,7 @@ function LandingPage() {
 				`Submitting batch purchase of ${batchItemCount} creator key${batchItemCount !== 1 ? 's' : ''}...`
 			);
 			// Simulated batch transaction — mirrors the existing stub pattern.
-			await new Promise<void>(resolve =>
-				window.setTimeout(resolve, 1800)
-			);
+			await new Promise<void>(resolve => window.setTimeout(resolve, 1800));
 			toast.remove();
 			const fakeTxHash =
 				'0xbatch' +
@@ -333,7 +328,8 @@ function LandingPage() {
 				.map(i => i.creatorName)
 				.slice(0, 3)
 				.join(', ');
-			const extraCount = batchItems.length > 3 ? ` +${batchItems.length - 3} more` : '';
+			const extraCount =
+				batchItems.length > 3 ? ` +${batchItems.length - 3} more` : '';
 			showToast.transactionSuccess(
 				'Batch purchase confirmed!',
 				`Purchased keys for ${creatorNames}${extraCount}.`,
@@ -838,6 +834,7 @@ function LandingPage() {
 	const selfFreezeMutation = useSelfFreezeMutation(activeWalletAddress);
 	const reinvestMutation = useReinvestDividendMutation(activeWalletAddress);
 	const redeemMutation = useRedeemDeprecatedKeyMutation(activeWalletAddress);
+	const batchTransferMutation = useBatchTransferMutation(activeWalletAddress);
 	const { data: cachedHoldings = [] } = useWalletHoldings(activeWalletAddress);
 
 	// Merged: keep total-value sorting (feature/holdings-sorting-tests) while
@@ -861,9 +858,9 @@ function LandingPage() {
 						quantity: cached?.quantity ?? baseQuantity,
 						priceStroops: creator.priceStroops,
 						price: creator.price,
-										frozenQuantity: cached?.frozenQuantity ?? 0,
-										liquidQuantity:
-											cached?.liquidQuantity ?? cached?.quantity ?? baseQuantity,
+						frozenQuantity: cached?.frozenQuantity ?? 0,
+						liquidQuantity:
+							cached?.liquidQuantity ?? cached?.quantity ?? baseQuantity,
 						isPriceLoading: isPriceRefreshing,
 						isPriceStale: creatorsAreStale,
 						pending: cached?.pending ?? false,
@@ -1673,7 +1670,10 @@ function LandingPage() {
 										onClick={() => setSharePortfolioOpen(true)}
 										className="inline-flex items-center gap-2 self-start rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white transition hover:border-white/30 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-amber-400/50 sm:self-auto cursor-pointer"
 									>
-										<Share2 className="size-3.5 text-amber-300" aria-hidden="true" />
+										<Share2
+											className="size-3.5 text-amber-300"
+											aria-hidden="true"
+										/>
 										<span>Share Performance</span>
 									</button>
 								</div>
@@ -1703,36 +1703,65 @@ function LandingPage() {
 												creator={creator}
 												onBuy={() => openTradeDialog('buy')}
 												onSell={() => openTradeDialog('sell')}
-														onReinvest={async creatorId => {
-															const heldPosition = heldKeyPositions.find(
-																item => item.creatorId === creatorId
-															);
-															const estimate = estimateReinvest(
-																heldPosition?.unclaimedDividend ?? 0,
-																resolveCreatorKeyPriceStroops(heldPosition ?? {})
-															);
-															if (!estimate) {
-																showToast.error(
-																	'Reinvest estimate unavailable. Please refresh prices and try again.'
-																);
-																return;
-															}
-															await reinvestMutation.mutateAsync({
-																keyId: creatorId,
-																amount: heldPosition?.unclaimedDividend ?? 0,
-																keys: estimate.wholeKeys,
-															});
-													}}
-													onRedeem={async creatorId => {
-													await redeemMutation.mutateAsync({
-															creatorId,
-															quantity:
-																heldKeyPositions.find(item => item.creatorId === creatorId)?.quantity ?? 0,
+												onReinvest={async creatorId => {
+													const heldPosition =
+														heldKeyPositions.find(
+															item =>
+																item.creatorId === creatorId
+														);
+													const estimate = estimateReinvest(
+														heldPosition?.unclaimedDividend ?? 0,
+														resolveCreatorKeyPriceStroops(
+															heldPosition ?? {}
+														)
+													);
+													if (!estimate) {
+														showToast.error(
+															'Reinvest estimate unavailable. Please refresh prices and try again.'
+														);
+														return;
+													}
+													await reinvestMutation.mutateAsync({
+														keyId: creatorId,
+														amount:
+															heldPosition?.unclaimedDividend ??
+															0,
+														keys: estimate.wholeKeys,
 													});
 												}}
-														onFreeze={position => openSelfFreezeDialog('freeze', position)}
-														onUnfreeze={position => openSelfFreezeDialog('unfreeze', position)}
-												isSubmitting={tradeSubmitting}
+												onRedeem={async creatorId => {
+													await redeemMutation.mutateAsync({
+														creatorId,
+														quantity:
+															heldKeyPositions.find(
+																item =>
+																	item.creatorId === creatorId
+															)?.quantity ?? 0,
+													});
+												}}
+												onFreeze={position =>
+													openSelfFreezeDialog('freeze', position)
+												}
+												onUnfreeze={position =>
+													openSelfFreezeDialog(
+														'unfreeze',
+														position
+													)
+												}
+												onBatchTransfer={() => {}}
+												onBatchTransferSubmit={async (
+													recipients,
+													creatorId
+												) => {
+													await batchTransferMutation.mutateAsync({
+														creatorId,
+														recipients,
+													});
+												}}
+												isSubmitting={
+													tradeSubmitting ||
+													batchTransferMutation.isPending
+												}
 												isReinvesting={reinvestMutation.isPending}
 												isRedeeming={redeemMutation.isPending}
 												isNetworkMismatch={isNetworkMismatch}
@@ -1746,13 +1775,14 @@ function LandingPage() {
 						open={selfFreezeDialog !== null}
 						action={selfFreezeDialog?.action ?? 'freeze'}
 						creatorName={
-							creators.find(item => item.id === selfFreezeDialog?.position.creatorId)?.title ??
-							'creator'
+							creators.find(
+								item => item.id === selfFreezeDialog?.position.creatorId
+							)?.title ?? 'creator'
 						}
 						availableQuantity={
 							selfFreezeDialog?.action === 'unfreeze'
-								? selfFreezeDialog.position.frozenQuantity ?? 0
-								: selfFreezeDialog?.position.liquidQuantity ?? 0
+								? (selfFreezeDialog.position.frozenQuantity ?? 0)
+								: (selfFreezeDialog?.position.liquidQuantity ?? 0)
 						}
 						isSubmitting={selfFreezeMutation.isPending}
 						onOpenChange={open => !open && setSelfFreezeDialog(null)}
@@ -1975,9 +2005,15 @@ function LandingPage() {
 												className="rounded-xl"
 												onClick={() => openTradeDialog('buy')}
 												disabled={
-													isNetworkMismatch || tradeSubmitting || isPaused
+													isNetworkMismatch ||
+													tradeSubmitting ||
+													isPaused
 												}
-												title={isPaused ? 'Trading suspended: contract is paused' : undefined}
+												title={
+													isPaused
+														? 'Trading suspended: contract is paused'
+														: undefined
+												}
 											>
 												Buy
 											</Button>
@@ -1986,9 +2022,15 @@ function LandingPage() {
 												variant="outline"
 												onClick={() => openTradeDialog('sell')}
 												disabled={
-													isNetworkMismatch || tradeSubmitting || isPaused
+													isNetworkMismatch ||
+													tradeSubmitting ||
+													isPaused
 												}
-												title={isPaused ? 'Trading suspended: contract is paused' : undefined}
+												title={
+													isPaused
+														? 'Trading suspended: contract is paused'
+														: undefined
+												}
 											>
 												Sell
 											</Button>
@@ -1997,9 +2039,15 @@ function LandingPage() {
 												variant="outline"
 												onClick={() => openTradeDialog('stake')}
 												disabled={
-													isNetworkMismatch || tradeSubmitting || isPaused
+													isNetworkMismatch ||
+													tradeSubmitting ||
+													isPaused
 												}
-												title={isPaused ? 'Trading suspended: contract is paused' : undefined}
+												title={
+													isPaused
+														? 'Trading suspended: contract is paused'
+														: undefined
+												}
 											>
 												Stake
 											</Button>
@@ -2008,9 +2056,15 @@ function LandingPage() {
 												variant="outline"
 												onClick={() => openTradeDialog('transfer')}
 												disabled={
-													isNetworkMismatch || tradeSubmitting || isPaused
+													isNetworkMismatch ||
+													tradeSubmitting ||
+													isPaused
 												}
-												title={isPaused ? 'Trading suspended: contract is paused' : undefined}
+												title={
+													isPaused
+														? 'Trading suspended: contract is paused'
+														: undefined
+												}
 											>
 												Transfer
 											</Button>
@@ -2029,13 +2083,19 @@ function LandingPage() {
 						)}
 					</SectionErrorBoundary>
 
-					<SectionDivider title="Staking Vault & Governance" spacing="relaxed" />
+					<SectionDivider
+						title="Staking Vault & Governance"
+						spacing="relaxed"
+					/>
 
 					<MultiKeyStakingVault className="mt-6" />
 
 					<TimelockAdminPanel className="mt-6" />
 
-					<SectionDivider title="Creator Key Management" spacing="relaxed" />
+					<SectionDivider
+						title="Creator Key Management"
+						spacing="relaxed"
+					/>
 
 					<div className="mt-6">
 						<CreatorKeyDashboard />
@@ -2090,8 +2150,16 @@ function LandingPage() {
 											className="rounded-xl"
 											size="sm"
 											onClick={() => openTradeDialog('buy')}
-											disabled={isNetworkMismatch || tradeSubmitting || isPaused}
-											title={isPaused ? 'Trading suspended: contract is paused' : undefined}
+											disabled={
+												isNetworkMismatch ||
+												tradeSubmitting ||
+												isPaused
+											}
+											title={
+												isPaused
+													? 'Trading suspended: contract is paused'
+													: undefined
+											}
 										>
 											Buy
 										</Button>
@@ -2100,8 +2168,16 @@ function LandingPage() {
 											size="sm"
 											variant="outline"
 											onClick={() => openTradeDialog('sell')}
-											disabled={isNetworkMismatch || tradeSubmitting || isPaused}
-											title={isPaused ? 'Trading suspended: contract is paused' : undefined}
+											disabled={
+												isNetworkMismatch ||
+												tradeSubmitting ||
+												isPaused
+											}
+											title={
+												isPaused
+													? 'Trading suspended: contract is paused'
+													: undefined
+											}
 										>
 											Sell
 										</Button>
@@ -2110,8 +2186,16 @@ function LandingPage() {
 											size="sm"
 											variant="outline"
 											onClick={() => openTradeDialog('stake')}
-											disabled={isNetworkMismatch || tradeSubmitting || isPaused}
-											title={isPaused ? 'Trading suspended: contract is paused' : undefined}
+											disabled={
+												isNetworkMismatch ||
+												tradeSubmitting ||
+												isPaused
+											}
+											title={
+												isPaused
+													? 'Trading suspended: contract is paused'
+													: undefined
+											}
 										>
 											Stake
 										</Button>
@@ -2120,8 +2204,16 @@ function LandingPage() {
 											size="sm"
 											variant="outline"
 											onClick={() => openTradeDialog('transfer')}
-											disabled={isNetworkMismatch || tradeSubmitting || isPaused}
-											title={isPaused ? 'Trading suspended: contract is paused' : undefined}
+											disabled={
+												isNetworkMismatch ||
+												tradeSubmitting ||
+												isPaused
+											}
+											title={
+												isPaused
+													? 'Trading suspended: contract is paused'
+													: undefined
+											}
 										>
 											Transfer
 										</Button>
@@ -2185,9 +2277,7 @@ function LandingPage() {
 			/>
 
 			{/* Batch buy basket (#954) */}
-			<BatchBuyBasketTrigger
-				onClick={() => setBatchBasketOpen(true)}
-			/>
+			<BatchBuyBasketTrigger onClick={() => setBatchBasketOpen(true)} />
 			<BatchBuyBasket
 				open={batchBasketOpen}
 				onClose={() => setBatchBasketOpen(false)}
