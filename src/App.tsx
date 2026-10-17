@@ -7,6 +7,7 @@ import AppErrorBoundary from './components/common/AppErrorBoundary';
 import ContractPausedBanner from './components/common/ContractPausedBanner';
 import OfflineBanner from './components/common/OfflineBanner';
 import GlobalPauseBanner from './components/common/GlobalPauseBanner';
+import PendingTransactionBanner from './components/common/PendingTransactionBanner';
 import SessionExpiryWatcher from './components/common/SessionExpiryWatcher';
 import { useContractPausedStore } from './hooks/useContractPausedStore';
 import { routes } from './routes';
@@ -45,6 +46,7 @@ function App() {
 			<ContractPausedBanner />
 			<OfflineBanner />
 			<GlobalPauseBanner />
+			<PendingTransactionBanner />
 			<Toaster
 				toastOptions={{
 					ariaProps: {
