@@ -32,6 +32,7 @@ import BundlesPage from './pages/BundlesPage';
 import BundleDetailPage from './pages/BundleDetailPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import KeyDiscoveryFeedPage from './pages/KeyDiscoveryFeedPage';
+import WalletPortfolioPage from './pages/WalletPortfolioPage';
 import AutoInvestDashboardPage from './pages/AutoInvestDashboardPage';
 import RouteErrorBoundary from './components/common/RouteErrorBoundary';
 
@@ -167,6 +168,14 @@ export const routes = [
 			{
 				path: '/profile/:wallet',
 				element: withRouteErrorBoundary(<ProfilePage />, 'Portfolio'),
+			},
+			{
+				// Wallet portfolio table with holdings + PnL breakdown (#1116).
+				path: '/portfolio',
+				element: withRouteErrorBoundary(
+					<WalletPortfolioPage />,
+					'Wallet portfolio'
+				),
 			},
 			{
 				path: '/following',
