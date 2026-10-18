@@ -124,6 +124,8 @@ export interface TradeDialogProps {
 	launchPenaltyBps?: number | null;
 	/** Max buy quantity allowed per transaction; null means no limit. */
 	maxBuyQuantity?: number | null;
+	/** Keys still available to mint for this creator; null means no ceiling (#753). */
+	availableSupply?: number | null;
 	/** Live key trading config carrying the bid-ask spread (#951). */
 	keyConfig?: KeyConfig | null;
 	/** Whether the key config query is still loading. */
@@ -168,6 +170,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 	currentLedger,
 	launchPenaltyBps,
 	maxBuyQuantity = null,
+	availableSupply = null,
 	keyConfig,
 	isKeyConfigLoading = false,
 	circuitBreakerThresholdPercent,
@@ -355,6 +358,9 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 
 	const validationError = useMemo((): string | null => {
 		const normalized = amountText.trim();
+		if (side === 'buy' && (!normalized || !Number.isFinite(parsedAmount) || parsedAmount < 1)) {
+			return 'Minimum quantity is 1';
+		}
 		if (!normalized) return 'Please enter an amount.';
 		if (!Number.isFinite(parsedAmount))
 			return 'Amount must be a valid number.';
@@ -372,6 +378,12 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 		)
 			return `Maximum ${formatNumber(maxBuyQuantity)} keys per transaction for this key`;
 		if (
+			side === 'buy' &&
+			availableSupply != null &&
+			parsedAmount > availableSupply
+		)
+			return 'Exceeds available supply';
+		if (
 			(side === 'sell' || side === 'stake' || side === 'transfer') &&
 			parsedAmount > availableHoldings
 		)
@@ -385,6 +397,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({
 		atCap,
 		maxBuyable,
 		maxBuyQuantity,
+		availableSupply,
 		isPaused,
 	]);
 

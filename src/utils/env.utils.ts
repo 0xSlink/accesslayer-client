@@ -8,6 +8,11 @@ const envSchema = z.object({
 	VITE_SEPOLIA_RPC_URL: z.string().optional(),
 	VITE_MAINNET_RPC_URL: z.string().optional(),
 	VITE_STELLAR_RPC_URL: z.string().optional(),
+	// Horizon (not Soroban RPC) base URL, used to poll transaction status
+	// after submission (#1082). Public endpoints are stable per network, so
+	// unlike VITE_STELLAR_RPC_URL this has a safe default rather than failing
+	// closed.
+	VITE_HORIZON_URL: z.string().optional(),
 	VITE_STELLAR_NETWORK: z.enum(['mainnet', 'testnet']).default('testnet'),
 	VITE_CREATOR_KEYS_CONTRACT_ID: z.string().optional(),
 	// Comma-separated wallet addresses that may access the admin safety panel.
@@ -33,6 +38,7 @@ export const env = envSchema.parse({
 	VITE_SEPOLIA_RPC_URL: import.meta.env.VITE_SEPOLIA_RPC_URL,
 	VITE_MAINNET_RPC_URL: import.meta.env.VITE_MAINNET_RPC_URL,
 	VITE_STELLAR_RPC_URL: import.meta.env.VITE_STELLAR_RPC_URL,
+	VITE_HORIZON_URL: import.meta.env.VITE_HORIZON_URL,
 	VITE_STELLAR_NETWORK: import.meta.env.VITE_STELLAR_NETWORK,
 	VITE_CREATOR_KEYS_CONTRACT_ID: import.meta.env.VITE_CREATOR_KEYS_CONTRACT_ID,
 	VITE_ADMIN_WALLETS: import.meta.env.VITE_ADMIN_WALLETS,
