@@ -31,6 +31,7 @@ import HolderLeaderboardPage from './pages/HolderLeaderboardPage';
 import BundlesPage from './pages/BundlesPage';
 import BundleDetailPage from './pages/BundleDetailPage';
 import SearchResultsPage from './pages/SearchResultsPage';
+import KeyDiscoveryFeedPage from './pages/KeyDiscoveryFeedPage';
 import AutoInvestDashboardPage from './pages/AutoInvestDashboardPage';
 import RouteErrorBoundary from './components/common/RouteErrorBoundary';
 
@@ -72,6 +73,11 @@ export const routes = [
 			{
 				path: '/discover',
 				element: <DiscoveryPage />,
+			},
+			{
+				// Key discovery feed with sort + category filters (#1113).
+				path: '/discovery/feed',
+				element: <KeyDiscoveryFeedPage />,
 			},
 			{
 				path: '/leaderboard',
