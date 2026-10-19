@@ -144,7 +144,7 @@ export class KeyPriceSocket {
 		const resolvedUrl = url?.trim() || null;
 		const defaultFactory: WebSocketFactory | null =
 			typeof WebSocket !== 'undefined'
-				? target => new WebSocket(target)
+				? (target: string): WebSocketLike => new WebSocket(target) as unknown as WebSocketLike
 				: null;
 
 		this.url = resolvedUrl;
